@@ -24,6 +24,11 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* The hidden attribute must always win over class-based display rules
+   (e.g. .lightbox/.login-wrap use display:flex, which would otherwise
+   keep them on screen). */
+[hidden] { display: none !important; }
+
 html { scroll-behavior: smooth; }
 
 body {
