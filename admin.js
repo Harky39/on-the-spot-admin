@@ -11,8 +11,23 @@
   var SALT = "ots-admin-v1-2026";
   var HASH = "047f1b09dafbe516247bc8a9d1ac6d1dd62c662d27b95cab970bb2702cdb2008";
 
+  var PUBLISHED_TOKEN = ""; // key published in the data repo's config.json, loaded at startup
+
+  function loadPublishedToken() {
+    fetch(DATA_BASE + "/config.json", { cache: "no-store" })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (cfg) {
+        if (cfg && Array.isArray(cfg.tokenParts)) {
+          try { PUBLISHED_TOKEN = decodeURIComponent(escape(atob(cfg.tokenParts.join("")))).trim(); } catch (_) {}
+        }
+      })
+      .catch(function () {});
+  }
+
   function getToken() {
-    try { return (localStorage.getItem("otsDataToken") || "").trim(); } catch (_) { return ""; }
+    var local;
+    try { local = (localStorage.getItem("otsDataToken") || "").trim(); } catch (_) { local = ""; }
+    return local || PUBLISHED_TOKEN; // fall back to the key published on the websites
   }
   function setToken(t) {
     try { localStorage.setItem("otsDataToken", t.trim()); } catch (_) {}
@@ -731,6 +746,7 @@
   }
 
   /* ---------- Boot ---------- */
+  loadPublishedToken(); // so API calls work even on a browser with no saved key
   ["car", "van"].forEach(bindContentSection);
   try {
     if (sessionStorage.getItem("otsAdmin") === "1") showApp();
