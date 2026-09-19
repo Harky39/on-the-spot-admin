@@ -56,6 +56,7 @@
         <button type="button" class="tab active" data-tab="quotes">Quotes</button>
         <button type="button" class="tab" data-tab="car">Car site</button>
         <button type="button" class="tab" data-tab="van">Van site</button>
+        <button type="button" class="tab" data-tab="styles">Styles</button>
         <button type="button" class="tab" data-tab="settings">Settings</button>
       </nav>
 
@@ -172,6 +173,26 @@
       <div class="save-row">
         <button type="button" class="btn btn-primary" data-save-content>Save changes to site</button>
         <span class="save-status" data-save-status></span>
+      </div>
+    </section>
+
+    <!-- ---------- STYLES ---------- -->
+    <section class="tab-panel" id="panel-styles" hidden>
+      <div class="panel-head">
+        <h2>Site styles</h2>
+      </div>
+      <p class="hint">Pick a look for the websites. Each style completely changes the layout, colours and type &mdash; not just a recolour. The current look is kept as &ldquo;Classic&rdquo;. Changes appear on the public site within a minute or two.</p>
+
+      <div class="scope-row" id="styleScopeRow">
+        <span class="scope-label">Apply to:</span>
+        <label class="scope-opt"><input type="radio" name="styleScope" value="both" checked /> Both sites</label>
+        <label class="scope-opt"><input type="radio" name="styleScope" value="car" /> Car &amp; van bodywork only</label>
+        <label class="scope-opt"><input type="radio" name="styleScope" value="van" /> Caravan repairs only</label>
+      </div>
+
+      <p class="save-status" id="styleStatus"></p>
+      <div class="style-grid" id="styleGrid">
+        <p class="hint">Loading styles&hellip;</p>
       </div>
     </section>
 

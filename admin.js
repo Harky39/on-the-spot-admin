@@ -177,6 +177,7 @@
     Array.prototype.forEach.call(document.querySelectorAll(".tab-panel"), function (p) {
       p.hidden = p.id !== "panel-" + name;
     });
+    if (name === "styles") { loadStyles(); return; } // always re-read current themes
     if (!loadedTabs[name]) {
       loadedTabs[name] = true;
       if (name === "quotes") loadQuotes();
@@ -402,6 +403,97 @@
       list.forEach(function (q) { if (q.id === id) Object.keys(patch).forEach(function (k) { q[k] = patch[k]; }); });
       return ghPut("quotes/index.json", utf8ToBase64(JSON.stringify(list, null, 2)), "Update quote index: " + id, fileData.sha);
     }).then(loadQuotes);
+  }
+
+  /* ---------- Site styles ---------- */
+  var SITE_STYLES = [
+    { id: "classic", name: "Classic", desc: "The original warm paper-and-orange look.", pv: "pv-classic" },
+    { id: "bold-studio", name: "Bold Studio", desc: "Dark industrial studio — huge type, sharp edges, electric orange-red.", pv: "pv-bold" },
+    { id: "editorial", name: "Editorial", desc: "Magazine style — narrow column, serif type, full-width photo rows.", pv: "pv-editorial" },
+    { id: "bento", name: "Bento", desc: "Modern app look — rounded tiles on grey, floating pill nav, gradients.", pv: "pv-bento" },
+    { id: "retro-garage", name: "Retro Garage", desc: "70s garage vibe — slab type, chunky borders, ticket-stub cards.", pv: "pv-retro" },
+    { id: "mono-minimal", name: "Mono Minimal", desc: "Strict black & white — hairline rules, mono labels, grayscale photos.", pv: "pv-mono" },
+    { id: "split-sidebar", name: "Split Sidebar", desc: "Fixed left navigation rail with the content offset to the right.", pv: "pv-split" },
+    { id: "soft-pastel", name: "Soft Pastel", desc: "Friendly pastels — blob shapes, big rounded cards, playful chips.", pv: "pv-soft" },
+    { id: "noir-luxury", name: "Noir Luxury", desc: "Deep navy & gold — elegant serif type, small caps, refined spacing.", pv: "pv-noir" },
+    { id: "performance", name: "Performance", desc: "Motorsport look — racing red, angled cuts, condensed italic type.", pv: "pv-perf" }
+  ];
+
+  function currentThemes() {
+    var out = {};
+    return Promise.all(["car", "van"].map(function (site) {
+      return fetch(DATA_BASE + "/" + site + "/content.json", { cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (d) { out[site] = (d && d.theme) || "classic"; })
+        .catch(function () { out[site] = "classic"; });
+    })).then(function () { return out; });
+  }
+
+  function renderStyleGrid(themes) {
+    var grid = document.getElementById("styleGrid");
+    if (!grid) return;
+    grid.innerHTML = "";
+    SITE_STYLES.forEach(function (s) {
+      var inUse = [];
+      if (themes.car === s.id) inUse.push("Car site");
+      if (themes.van === s.id) inUse.push("Van site");
+
+      var card = el("div", "style-card" + (inUse.length ? " style-active" : ""));
+      card.appendChild(el("div", "style-preview " + s.pv));
+
+      var body = el("div", "style-body");
+      body.appendChild(el("h3", null, s.name));
+      body.appendChild(el("p", "style-desc", s.desc));
+      if (inUse.length) body.appendChild(el("span", "style-badge", "In use: " + inUse.join(" & ")));
+
+      var btn = el("button", "btn btn-primary btn-sm style-apply", s.id === "classic" ? "Use Classic" : "Use this style");
+      btn.type = "button";
+      btn.addEventListener("click", function () { applyStyle(s.id, btn); });
+      body.appendChild(btn);
+
+      card.appendChild(body);
+      grid.appendChild(card);
+    });
+  }
+
+  function loadStyles() {
+    var status = document.getElementById("styleStatus");
+    if (status) status.textContent = "Loading…";
+    currentThemes().then(renderStyleGrid).catch(function () {
+      if (status) status.textContent = "Couldn't read the current styles — try again in a moment.";
+    });
+  }
+
+  function applyStyle(themeId, btn) {
+    var scopeEl = document.querySelector('input[name="styleScope"]:checked');
+    var scope = scopeEl ? scopeEl.value : "both";
+    var targets = scope === "both" ? ["car", "van"] : [scope];
+    var status = document.getElementById("styleStatus");
+    if (btn) btn.disabled = true;
+    if (status) status.textContent = "Applying…";
+
+    function updateSite(site) {
+      return ghGet(site + "/content.json").then(function (fileData) {
+        var data = JSON.parse(atob(fileData.content)) || {};
+        if (themeId === "classic") delete data.theme; else data.theme = themeId;
+        data.updated = new Date().toISOString();
+        return ghPut(site + "/content.json", utf8ToBase64(JSON.stringify(data, null, 2)), "Set site style: " + themeId, fileData.sha);
+      });
+    }
+
+    var chain = Promise.resolve();
+    targets.forEach(function (site) {
+      chain = chain.then(function () { return updateSite(site); });
+    });
+
+    chain.then(function () {
+      if (status) status.textContent = "Done ✓ — the new style will appear on the site within a minute or two.";
+      loadStyles(); // refresh the in-use badges
+    }).catch(function (err) {
+      if (status) status.textContent = "Couldn't apply the style: " + ((err && err.message) || String(err));
+    }).then(function () {
+      if (btn) btn.disabled = false;
+    });
   }
 
   /* ---------- Content editor (car & van) ---------- */
