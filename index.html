@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>On The Spot — Staff</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%97%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div class="login-wrap" id="loginView">
+  <form class="login-card" id="loginForm" novalidate>
+    <span class="brand-mark" aria-hidden="true">
+      <svg viewBox="0 0 32 32" fill="none">
+        <path d="M4 18v-4a2 2 0 0 1 2-2h1l3-4.5h9.5L23 12h1a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" fill="#fff"/>
+        <rect x="11.5" y="8.8" width="7" height="3.2" rx="0.9" fill="#d98e2b"/>
+        <circle cx="9.5" cy="23" r="2.7" fill="#fff"/><circle cx="9.5" cy="23" r="1.3" fill="#d98e2b"/>
+        <circle cx="20.5" cy="23" r="2.7" fill="#fff"/><circle cx="20.5" cy="23" r="1.3" fill="#d98e2b"/>
+      </svg>
+    </span>
+    <h1>On The Spot</h1>
+    <p class="login-sub">Staff login — quotes &amp; site content</p>
+
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" autocomplete="username" required />
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" autocomplete="current-password" required />
+
+    <p class="login-error" id="loginError" hidden></p>
+    <button type="submit" class="btn btn-primary btn-block" id="loginBtn">Sign in</button>
+  </form>
+</div>
+
+<!-- ================= APP ================= -->
+<div class="app" id="appView" hidden>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <span class="brand-mark sm" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none">
+          <path d="M4 18v-4a2 2 0 0 1 2-2h1l3-4.5h9.5L23 12h1a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z" fill="#fff"/>
+          <rect x="11.5" y="8.8" width="7" height="3.2" rx="0.9" fill="#d98e2b"/>
+          <circle cx="9.5" cy="23" r="2.7" fill="#fff"/><circle cx="9.5" cy="23" r="1.3" fill="#d98e2b"/>
+          <circle cx="20.5" cy="23" r="2.7" fill="#fff"/><circle cx="20.5" cy="23" r="1.3" fill="#d98e2b"/>
+        </svg>
+      </span>
+      <span class="topbar-title">On The Spot<small>Staff panel</small></span>
+
+      <nav class="tabs" id="tabNav" aria-label="Sections">
+        <button type="button" class="tab active" data-tab="quotes">Quotes</button>
+        <button type="button" class="tab" data-tab="car">Car site</button>
+        <button type="button" class="tab" data-tab="van">Van site</button>
+        <button type="button" class="tab" data-tab="settings">Settings</button>
+      </nav>
+
+      <button type="button" class="btn btn-ghost btn-sm" id="logoutBtn">Log out</button>
+    </div>
+  </header>
+
+  <main class="container app-main">
+
+    <!-- ---------- QUOTES ---------- -->
+    <section class="tab-panel" id="panel-quotes">
+      <div class="panel-head">
+        <h2>Quote requests</h2>
+        <div class="panel-actions">
+          <select id="quoteFilter" aria-label="Filter by site">
+            <option value="all">All sites</option>
+            <option value="car">Car &amp; van bodywork</option>
+            <option value="van">Caravan repairs</option>
+          </select>
+          <button type="button" class="btn btn-ghost btn-sm" id="refreshQuotes">Refresh</button>
+        </div>
+      </div>
+      <p class="hint" id="quotesHint"></p>
+      <div id="quoteList" class="quote-list"></div>
+      <div id="quoteDetail" hidden></div>
+    </section>
+
+    <!-- ---------- CAR SITE CONTENT ---------- -->
+    <section class="tab-panel" id="panel-car" data-site="car" hidden>
+      <div class="panel-head">
+        <h2>Car &amp; Van Bodywork — site content</h2>
+        <a class="btn btn-ghost btn-sm" href="https://harky39.github.io/on-the-spot-car-van-bodywork/" target="_blank" rel="noopener">View live site &nearr;</a>
+      </div>
+      <p class="hint">Changes appear on the public site within a minute or two of saving. Photos you upload are stored in the shared data repo.</p>
+
+      <fieldset class="editor-block">
+        <legend>Before / after showcase (the slider at the top of &ldquo;Our Work&rdquo;)</legend>
+        <div class="img-pair">
+          <div class="img-field">
+            <label for="showcase-before-car">Before image URL</label>
+            <input type="text" id="showcase-before-car" data-role="showcase-before" spellcheck="false" />
+            <div class="field-actions">
+              <button type="button" class="btn btn-ghost btn-sm" data-upload-for="showcase-before">Upload photo&hellip;</button>
+              <input type="file" accept="image/*" hidden data-file-for="showcase-before" />
+            </div>
+            <img class="thumb" data-thumb-for="showcase-before" alt="" hidden />
+          </div>
+          <div class="img-field">
+            <label for="showcase-after-car">After image URL</label>
+            <input type="text" id="showcase-after-car" data-role="showcase-after" spellcheck="false" />
+            <div class="field-actions">
+              <button type="button" class="btn btn-ghost btn-sm" data-upload-for="showcase-after">Upload photo&hellip;</button>
+              <input type="file" accept="image/*" hidden data-file-for="showcase-after" />
+            </div>
+            <img class="thumb" data-thumb-for="showcase-after" alt="" hidden />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="editor-block">
+        <legend>Workshop gallery (&ldquo;More from the workshop&rdquo;)</legend>
+        <p class="hint small">Each photo gets a label — Before, In progress or After.</p>
+        <div data-role="gallery-items"></div>
+        <button type="button" class="btn btn-ghost" data-add-gallery>Add before/after photo&hellip;</button>
+        <input type="file" accept="image/*" hidden data-role="gallery-file" />
+      </fieldset>
+
+      <div class="save-row">
+        <button type="button" class="btn btn-primary" data-save-content>Save changes to site</button>
+        <span class="save-status" data-save-status></span>
+      </div>
+    </section>
+
+    <!-- ---------- VAN SITE CONTENT ---------- -->
+    <section class="tab-panel" id="panel-van" data-site="van" hidden>
+      <div class="panel-head">
+        <h2>Caravan Repairs — site content</h2>
+        <a class="btn btn-ghost btn-sm" href="https://harky39.github.io/on-the-spot-caravan-repairs/" target="_blank" rel="noopener">View live site &nearr;</a>
+      </div>
+      <p class="hint">Changes appear on the public site within a minute or two of saving. Photos you upload are stored in the shared data repo.</p>
+
+      <fieldset class="editor-block">
+        <legend>Before / after showcase (the slider at the top of &ldquo;Our Work&rdquo;)</legend>
+        <div class="img-pair">
+          <div class="img-field">
+            <label for="showcase-before-van">Before image URL</label>
+            <input type="text" id="showcase-before-van" data-role="showcase-before" spellcheck="false" />
+            <div class="field-actions">
+              <button type="button" class="btn btn-ghost btn-sm" data-upload-for="showcase-before">Upload photo&hellip;</button>
+              <input type="file" accept="image/*" hidden data-file-for="showcase-before" />
+            </div>
+            <img class="thumb" data-thumb-for="showcase-before" alt="" hidden />
+          </div>
+          <div class="img-field">
+            <label for="showcase-after-van">After image URL</label>
+            <input type="text" id="showcase-after-van" data-role="showcase-after" spellcheck="false" />
+            <div class="field-actions">
+              <button type="button" class="btn btn-ghost btn-sm" data-upload-for="showcase-after">Upload photo&hellip;</button>
+              <input type="file" accept="image/*" hidden data-file-for="showcase-after" />
+            </div>
+            <img class="thumb" data-thumb-for="showcase-after" alt="" hidden />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset class="editor-block">
+        <legend>Workshop gallery (&ldquo;More from the workshop&rdquo;)</legend>
+        <p class="hint small">Each photo gets a label — Before, In progress or After.</p>
+        <div data-role="gallery-items"></div>
+        <button type="button" class="btn btn-ghost" data-add-gallery>Add before/after photo&hellip;</button>
+        <input type="file" accept="image/*" hidden data-role="gallery-file" />
+      </fieldset>
+
+      <div class="save-row">
+        <button type="button" class="btn btn-primary" data-save-content>Save changes to site</button>
+        <span class="save-status" data-save-status></span>
+      </div>
+    </section>
+
+    <!-- ---------- SETTINGS ---------- -->
+    <section class="tab-panel" id="panel-settings" hidden>
+      <div class="panel-head"><h2>Settings</h2></div>
+
+      <fieldset class="editor-block">
+        <legend>Data token — lets the websites file quotes into this panel</legend>
+        <p class="hint small">Paste a fine-grained GitHub personal access token with <strong>Contents: read &amp; write</strong> on the <code>Harky39/on-the-spot-data</code> repo. &ldquo;Save &amp; publish&rdquo; stores it in this browser and publishes it to both websites, so new quote requests (with photos) appear under Quotes.</p>
+        <textarea id="tokenInput" rows="2" placeholder="github_pat_…" spellcheck="false"></textarea>
+        <div class="field-actions">
+          <button type="button" class="btn btn-primary btn-sm" id="publishToken">Save &amp; publish</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="clearLocalToken">Clear from this browser</button>
+        </div>
+        <p class="save-status" id="tokenStatus"></p>
+
+        <details class="pat-help">
+          <summary>How to create the token (about 2 minutes)</summary>
+          <ol>
+            <li>Sign in at github.com and open <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">Settings &rarr; Developer settings &rarr; Fine-grained tokens</a>.</li>
+            <li>Click <strong>Generate new token</strong> and name it e.g. &ldquo;on-the-spot-data&rdquo;.</li>
+            <li>Expiry: whatever you like (or no expiry).</li>
+            <li><strong>Repository access:</strong> choose &ldquo;Only selected repositories&rdquo; and tick <code>Harky39/on-the-spot-data</code>.</li>
+            <li><strong>Permissions:</strong> under Repository permissions, set <em>Contents</em> to <strong>Read and write</strong>. Leave everything else as No access.</li>
+            <li>Click <strong>Generate token</strong>, copy it (starts with <code>github_pat_</code>) and paste it above. GitHub only shows it once.</li>
+          </ol>
+        </details>
+
+        <div class="note-box">
+          <h3>Honest security notes</h3>
+          <ul>
+            <li>This login is a gate, not bank-grade security — the check happens in your browser. It keeps casual visitors out; it doesn't stop a determined one.</li>
+            <li>The data repo is public: anyone who knows a quote's exact URL could read it. Quote files use unguessable names, and email remains your private primary channel (every request also lands in peter.hark89@gmail.com).</li>
+            <li>If the token ever leaks, generate a new one on GitHub (the old one stops working immediately) and paste the replacement above.</li>
+          </ul>
+        </div>
+      </fieldset>
+
+      <button type="button" class="btn btn-ghost" id="logoutBtn2">Log out</button>
+    </section>
+
+  </main>
+</div>
+
+<!-- ================= LIGHTBOX ================= -->
+<div class="lightbox" id="lightbox" hidden>
+  <button type="button" class="lb-close" aria-label="Close">&times;</button>
+  <img id="lightboxImg" alt="" />
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>
