@@ -64,6 +64,10 @@
 
   function utf8ToBase64(str) { return btoa(unescape(encodeURIComponent(str))); }
 
+  // atob alone mangles non-ASCII (e.g. em dashes) into mojibake on re-save;
+  // this decodes the UTF-8 bytes GitHub returns back into real characters.
+  function b64ToUtf8(b64) { return decodeURIComponent(escape(atob(b64))); }
+
   function blobToBase64(blob) {
     return new Promise(function (resolve, reject) {
       var reader = new FileReader();
@@ -374,7 +378,7 @@
   function saveQuoteStatus(id, status) {
     if (!getToken()) { alert("Please set the data token in Settings first."); return; }
     ghGet("quotes/" + id + ".json").then(function (fileData) {
-      var quote = JSON.parse(atob(fileData.content));
+      var quote = JSON.parse(b64ToUtf8(fileData.content));
       quote.status = status;
       return ghPut("quotes/" + id + ".json", utf8ToBase64(JSON.stringify(quote, null, 2)), "Update quote status: " + id, fileData.sha);
     }).then(function () { return updateIndexEntry(id, { status: status }); })
@@ -394,7 +398,7 @@
       return ghGet("quotes/" + id + ".json").then(function (fd) { return ghDelete(fd.path, fd.sha); });
     }).then(function () {
       return ghGet("quotes/index.json").then(function (fileData) {
-        var list = JSON.parse(atob(fileData.content)) || [];
+        var list = JSON.parse(b64ToUtf8(fileData.content)) || [];
         list = list.filter(function (q) { return q.id !== id; });
         return ghPut("quotes/index.json", utf8ToBase64(JSON.stringify(list, null, 2)), "Remove quote from index: " + id, fileData.sha);
       });
@@ -414,7 +418,7 @@
 
   function updateIndexEntry(id, patch) {
     return ghGet("quotes/index.json").then(function (fileData) {
-      var list = JSON.parse(atob(fileData.content)) || [];
+      var list = JSON.parse(b64ToUtf8(fileData.content)) || [];
       list.forEach(function (q) { if (q.id === id) Object.keys(patch).forEach(function (k) { q[k] = patch[k]; }); });
       return ghPut("quotes/index.json", utf8ToBase64(JSON.stringify(list, null, 2)), "Update quote index: " + id, fileData.sha);
     }).then(loadQuotes);
@@ -489,7 +493,7 @@
 
     function updateSite(site) {
       return ghGet(site + "/content.json").then(function (fileData) {
-        var data = JSON.parse(atob(fileData.content)) || {};
+        var data = JSON.parse(b64ToUtf8(fileData.content)) || {};
         if (themeId === "classic") delete data.theme; else data.theme = themeId;
         data.updated = new Date().toISOString();
         return ghPut(site + "/content.json", utf8ToBase64(JSON.stringify(data, null, 2)), "Set site style: " + themeId, fileData.sha);
