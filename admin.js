@@ -266,17 +266,17 @@
   }, 60000);
 
   function renderQuoteList() {
-    var el = document.getElementById("quoteList");
+    var listEl = document.getElementById("quoteList");
     var filter = quoteState.filter;
     var items = quoteState.items.filter(function (q) { return filter === "all" || q.site === filter; });
 
     if (!items.length) {
-      el.innerHTML = "";
-      el.appendChild(el("p", "hint", "No quote requests here yet. New ones from the website forms will appear automatically."));
+      listEl.innerHTML = "";
+      listEl.appendChild(el("p", "hint", "No quote requests here yet. New ones from the website forms will appear automatically."));
       return;
     }
 
-    el.innerHTML = "";
+    listEl.innerHTML = "";
     items.forEach(function (q) {
       var card = el("div", "quote-card");
 
@@ -317,7 +317,7 @@
       actions.appendChild(viewBtn);
       card.appendChild(actions);
 
-      el.appendChild(card);
+      listEl.appendChild(card);
     });
   }
 
