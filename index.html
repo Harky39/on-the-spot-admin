@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=20260920d" />
+  <link rel="stylesheet" href="styles.css?v=20260920e" />
 </head>
 <body>
 
@@ -54,6 +54,7 @@
 
       <nav class="tabs" id="tabNav" aria-label="Sections">
         <button type="button" class="tab active" data-tab="quotes">Quotes</button>
+        <button type="button" class="tab" data-tab="visits">Visits</button>
         <button type="button" class="tab" data-tab="car">Car site</button>
         <button type="button" class="tab" data-tab="van">Van site</button>
         <button type="button" class="tab" data-tab="styles">Styles</button>
@@ -82,6 +83,18 @@
       <p class="hint" id="quotesHint"></p>
       <div id="quoteList" class="quote-list"></div>
       <div id="quoteDetail" hidden></div>
+    </section>
+
+    <!-- ---------- VISITS ---------- -->
+    <section class="tab-panel" id="panel-visits" hidden>
+      <div class="panel-head">
+        <h2>Visitors</h2>
+        <button type="button" class="btn btn-ghost btn-sm" id="refreshVisits">Refresh</button>
+      </div>
+      <p class="hint">Each person is counted once per site &mdash; the first time their browser opens it. Counting started when this feature went live, so early numbers will be small.</p>
+      <div class="visit-grid" id="visitGrid">
+        <p class="hint">Loading&hellip;</p>
+      </div>
     </section>
 
     <!-- ---------- CAR SITE CONTENT ---------- -->
@@ -244,6 +257,6 @@
   <img id="lightboxImg" alt="" />
 </div>
 
-<script src="admin.js?v=20260920d"></script>
+<script src="admin.js?v=20260920e"></script>
 </body>
 </html>

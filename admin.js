@@ -198,6 +198,7 @@
     });
     if (name === "styles") { loadStyles(); return; } // always re-read current themes
     if (name === "quotes") { loadQuotes(); return; } // inbox: always fetch the latest
+    if (name === "visits") { loadVisits(); return; } // live counts: always refresh
     if (!loadedTabs[name]) {
       loadedTabs[name] = true;
       if (name === "car" || name === "van") loadContent(name);
@@ -454,6 +455,69 @@
       return ghPut("quotes/index.json", utf8ToBase64(JSON.stringify(list, null, 2)), "Update quote index: " + id, fileData.sha);
     }).then(loadQuotes);
   }
+
+  /* ---------- Visits (unique visitors per site) ---------- */
+  function localDateStr(d) {
+    var p = function (n) { return (n < 10 ? "0" : "") + n; };
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+  }
+
+  // A missing folder simply means no visits yet — not an error.
+  function visitEntries(site) {
+    return ghGet("visits/" + site).catch(function (err) {
+      if (err && /404/.test(err.message)) return null;
+      throw err;
+    });
+  }
+
+  function countVisits(entries, todayStr) {
+    var total = 0, today = 0;
+    if (!Array.isArray(entries)) return { total: total, today: today };
+    entries.forEach(function (e) {
+      if (!e || e.type !== "file" || !e.name || e.name.charAt(0) === ".") return; // skip folders & dotfiles
+      total += 1;
+      if (e.name.indexOf(todayStr) === 0) today += 1;
+    });
+    return { total: total, today: today };
+  }
+
+  function buildVisitCard(site, counts) {
+    var card = el("div", "visit-card");
+    card.appendChild(el("h3", "visit-site", siteLabel(site)));
+    card.appendChild(el("div", "visit-number", String(counts.total)));
+    card.appendChild(el("p", "visit-label", "unique visitors · all time"));
+    var today = el("p", "visit-today");
+    today.textContent = counts.today + (counts.today === 1 ? " new visitor today" : " new visitors today");
+    card.appendChild(today);
+    return card;
+  }
+
+  function loadVisits(quiet) {
+    var grid = document.getElementById("visitGrid");
+    if (!grid) return;
+    if (!quiet) grid.innerHTML = '<p class="hint">Loading…</p>';
+    var todayStr = localDateStr(new Date());
+    Promise.all([visitEntries("car"), visitEntries("van")]).then(function (results) {
+      grid.innerHTML = "";
+      ["car", "van"].forEach(function (site, i) {
+        grid.appendChild(buildVisitCard(site, countVisits(results[i], todayStr)));
+      });
+    }).catch(function (err) {
+      if (!quiet) {
+        grid.innerHTML = "";
+        grid.appendChild(el("p", "hint", "Couldn't load visit counts (" + ((err && err.message) || String(err)) + ") — try Refresh."));
+      }
+    });
+  }
+
+  // Same inbox behaviour as Quotes: while the Visits tab is open, counts refresh on their own.
+  setInterval(function () {
+    var panel = document.getElementById("panel-visits");
+    if (panel && !panel.hidden) loadVisits(true);
+  }, 60000);
+
+  var refreshVisitsBtn = document.getElementById("refreshVisits");
+  if (refreshVisitsBtn) refreshVisitsBtn.addEventListener("click", function () { loadVisits(); });
 
   /* ---------- Site styles ---------- */
   var SITE_STYLES = [
