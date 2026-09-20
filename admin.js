@@ -214,6 +214,15 @@
   /* ---------- Quotes ---------- */
   var quoteState = { filter: "all", items: [] };
 
+  // Backup route for the quote index: GitHub API instead of the website copy.
+  function fetchQuoteIndexViaApi() {
+    return ghGet("quotes/index.json").then(function (fileData) {
+      var data = JSON.parse(b64ToUtf8(fileData.content));
+      if (!Array.isArray(data)) throw new Error("bad index");
+      return data;
+    });
+  }
+
   function loadQuotes(quiet) {
     var listEl = document.getElementById("quoteList");
     var hint = document.getElementById("quotesHint");
@@ -222,18 +231,31 @@
     if (!quiet) hint.textContent = "";
     if (!listEl.children.length) listEl.innerHTML = '<p class="hint">Loading…</p>';
 
-    fetch(DATA_BASE + "/quotes/index.json", { cache: "no-store" })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (items) {
-        quoteState.items = Array.isArray(items) ? items : [];
-        renderQuoteList();
-      })
-      .catch(function () {
-        if (!quiet) {
-          hint.textContent = "Couldn't load quotes — check your connection and try Refresh.";
-          listEl.innerHTML = "";
-        }
-      });
+    // Try the website copy; on failure use the API route, then retry a few times.
+    function tryFetch(retriesLeft, delayMs) {
+      return fetch(DATA_BASE + "/quotes/index.json", { cache: "no-store" })
+        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+        .catch(function (err) {
+          if (retriesLeft > 0) {
+            return fetchQuoteIndexViaApi().catch(function () {
+              return new Promise(function (resolve) { setTimeout(resolve, delayMs); }).then(function () {
+                return tryFetch(retriesLeft - 1, delayMs * 2);
+              });
+            });
+          }
+          throw err;
+        });
+    }
+
+    tryFetch(3, 2000).then(function (items) {
+      quoteState.items = Array.isArray(items) ? items : [];
+      renderQuoteList();
+    }).catch(function (err) {
+      if (!quiet) {
+        hint.textContent = "Couldn't load quotes (" + ((err && err.message) || String(err)) + ") — try Refresh.";
+        listEl.innerHTML = "";
+      }
+    });
   }
 
   // Inbox behaviour: while the Quotes tab is open, new requests appear on their own.
