@@ -197,10 +197,10 @@
       p.hidden = p.id !== "panel-" + name;
     });
     if (name === "styles") { loadStyles(); return; } // always re-read current themes
+    if (name === "quotes") { loadQuotes(); return; } // inbox: always fetch the latest
     if (!loadedTabs[name]) {
       loadedTabs[name] = true;
-      if (name === "quotes") loadQuotes();
-      else if (name === "car" || name === "van") loadContent(name);
+      if (name === "car" || name === "van") loadContent(name);
       else if (name === "settings") initSettings();
     }
   }
@@ -214,13 +214,13 @@
   /* ---------- Quotes ---------- */
   var quoteState = { filter: "all", items: [] };
 
-  function loadQuotes() {
+  function loadQuotes(quiet) {
     var listEl = document.getElementById("quoteList");
     var hint = document.getElementById("quotesHint");
     var detail = document.getElementById("quoteDetail");
-    if (detail) detail.hidden = true;
-    hint.textContent = "";
-    listEl.innerHTML = '<p class="hint">Loading…</p>';
+    if (detail && !quiet) detail.hidden = true;
+    if (!quiet) hint.textContent = "";
+    if (!listEl.children.length) listEl.innerHTML = '<p class="hint">Loading…</p>';
 
     fetch(DATA_BASE + "/quotes/index.json", { cache: "no-store" })
       .then(function (r) { return r.ok ? r.json() : null; })
@@ -229,10 +229,19 @@
         renderQuoteList();
       })
       .catch(function () {
-        hint.textContent = "Couldn't load quotes — check your connection and try Refresh.";
-        listEl.innerHTML = "";
+        if (!quiet) {
+          hint.textContent = "Couldn't load quotes — check your connection and try Refresh.";
+          listEl.innerHTML = "";
+        }
       });
   }
+
+  // Inbox behaviour: while the Quotes tab is open, new requests appear on their own.
+  setInterval(function () {
+    var panel = document.getElementById("panel-quotes");
+    var detail = document.getElementById("quoteDetail");
+    if (panel && !panel.hidden && (!detail || detail.hidden)) loadQuotes(true);
+  }, 60000);
 
   function renderQuoteList() {
     var el = document.getElementById("quoteList");
